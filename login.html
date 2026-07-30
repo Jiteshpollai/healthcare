@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login / Register — Brindavan Bhawan Organization</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --green:#155f35;--green-mid:#1e7d48;--green-light:#27a05c;
+  --saffron:#d9711f;--saffron-lt:#f0963e;
+  --cream:#fdf8f2;--charcoal:#18181b;--gray:#5c6470;
+}
+body{
+  font-family:'DM Sans',sans-serif;min-height:100vh;display:flex;
+  background:linear-gradient(135deg,#0c3a1e 0%,#155f35 45%,#8b3a0a 100%);
+  position:relative;overflow:hidden;
+}
+body::before{
+  content:'';position:absolute;inset:0;
+  background-image:radial-gradient(circle,rgba(255,255,255,.055) 1.5px,transparent 1.5px);
+  background-size:36px 36px;pointer-events:none;
+}
+body::after{
+  content:'';position:absolute;top:-200px;right:-200px;
+  width:600px;height:600px;border-radius:50%;
+  background:radial-gradient(circle,rgba(217,113,31,.16),transparent 70%);pointer-events:none;
+}
+
+/* ── LEFT PANEL ── */
+.left-panel{
+  flex:1;display:flex;flex-direction:column;
+  justify-content:center;padding:60px;position:relative;z-index:2;
+}
+.brand{display:flex;align-items:center;gap:14px;margin-bottom:52px}
+.brand-logo{
+  width:52px;height:52px;border-radius:50%;
+  background:linear-gradient(135deg,var(--green-light),#4ade80);
+  display:grid;place-items:center;font-size:22px;
+  box-shadow:0 4px 20px rgba(39,160,92,.4);
+}
+.brand-text strong{display:block;font-family:'Playfair Display',serif;font-size:1.05rem;color:#fff}
+.brand-text span{font-size:.73rem;color:rgba(255,255,255,.5);letter-spacing:.04em}
+.left-headline{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(2rem,3.5vw,2.9rem);
+  font-weight:900;color:#fff;line-height:1.1;margin-bottom:1.1rem;
+}
+.left-headline em{color:#7adfa4;font-style:normal}
+.left-sub{font-size:.93rem;color:rgba(255,255,255,.58);line-height:1.8;max-width:370px;margin-bottom:2.5rem}
+.pillars{display:flex;flex-direction:column;gap:.75rem}
+.pillar{
+  display:flex;align-items:center;gap:12px;
+  background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);
+  border-radius:14px;padding:12px 16px;transition:background .2s;
+}
+.pillar:hover{background:rgba(255,255,255,.12)}
+.pillar-icon{font-size:1.35rem;width:34px;text-align:center;flex-shrink:0}
+.pillar-text strong{display:block;font-size:.86rem;color:#fff;font-weight:600}
+.pillar-text span{font-size:.73rem;color:rgba(255,255,255,.48)}
+
+/* ── RIGHT PANEL ── */
+.right-panel{
+  width:500px;flex-shrink:0;display:flex;align-items:center;
+  justify-content:center;padding:28px 40px 28px 16px;
+  position:relative;z-index:2;
+}
+.card{
+  width:100%;background:rgba(255,255,255,.97);border-radius:28px;
+  padding:36px 38px;box-shadow:0 24px 80px rgba(0,0,0,.32);
+  max-height:96vh;overflow-y:auto;
+}
+.card::-webkit-scrollbar{width:4px}
+.card::-webkit-scrollbar-thumb{background:var(--green-light);border-radius:4px}
+
+/* ── TABS ── */
+.tabs{display:flex;background:#f1f5f1;border-radius:14px;padding:4px;margin-bottom:24px;gap:4px}
+.tab{
+  flex:1;padding:10px;border:none;border-radius:10px;background:transparent;
+  cursor:pointer;font-family:'DM Sans',sans-serif;font-size:.88rem;
+  font-weight:600;color:var(--gray);transition:.25s;
+}
+.tab.active{background:#fff;color:var(--green);box-shadow:0 2px 10px rgba(21,95,53,.12)}
+
+/* ── FORM HEAD ── */
+.form-head{margin-bottom:20px}
+.form-head h2{
+  font-family:'Playfair Display',serif;font-size:1.45rem;
+  font-weight:900;color:var(--charcoal);margin-bottom:.25rem;
+}
+.form-head p{font-size:.81rem;color:var(--gray)}
+
+/* ── STEP PROGRESS ── */
+.steps{display:flex;align-items:center;margin-bottom:22px}
+.step{display:flex;align-items:center;gap:5px;flex:1}
+.step-dot{
+  width:26px;height:26px;border-radius:50%;display:grid;place-items:center;
+  font-size:.7rem;font-weight:700;background:#e2e8f0;color:var(--gray);
+  flex-shrink:0;transition:.3s;border:2px solid #e2e8f0;
+}
+.step.done .step-dot{background:var(--green);color:#fff;border-color:var(--green)}
+.step.active .step-dot{background:#fff;color:var(--green);border-color:var(--green);box-shadow:0 0 0 3px rgba(21,95,53,.15)}
+.step-label{font-size:.67rem;font-weight:600;color:var(--gray);white-space:nowrap}
+.step.active .step-label,.step.done .step-label{color:var(--green)}
+.step-line{flex:1;height:2px;background:#e2e8f0;margin:0 4px;transition:.3s}
+.step.done .step-line{background:var(--green)}
+
+/* ── FORM PAGES ── */
+.fpage{display:none}.fpage.active{display:block}
+
+/* ── FIELD ── */
+.field{display:flex;flex-direction:column;gap:5px;margin-bottom:13px}
+.field label{font-size:.76rem;font-weight:600;color:var(--charcoal)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+
+input[type="text"],input[type="email"],
+input[type="password"],input[type="tel"],input[type="number"],
+select.sfield, textarea.tfield{
+  width:100%;padding:11px 13px;
+  border:1.5px solid #e2e8f0;border-radius:12px;
+  font-family:'DM Sans',sans-serif;font-size:.88rem;
+  color:var(--charcoal);background:#f8fafc;
+  outline:none;transition:border-color .2s,box-shadow .2s;
+}
+input:focus,select.sfield:focus,textarea.tfield:focus{
+  border-color:var(--green);box-shadow:0 0 0 3px rgba(21,95,53,.1);background:#fff;
+}
+input.err,select.err,textarea.err{border-color:#ef4444;box-shadow:0 0 0 3px rgba(239,68,68,.09)}
+select.sfield{
+  appearance:none;cursor:pointer;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%235c6470' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 13px center;background-color:#f8fafc;
+}
+select.sfield:focus{background-color:#fff}
+textarea.tfield{resize:none;min-height:68px}
+
+/* ── GENDER TOGGLE ── */
+.gender-group{display:flex;gap:9px;margin-top:2px}
+.gender-btn{
+  flex:1;padding:10px 6px;border:1.5px solid #e2e8f0;border-radius:12px;
+  background:#f8fafc;cursor:pointer;font-family:'DM Sans',sans-serif;
+  font-size:.84rem;font-weight:600;color:var(--gray);
+  display:flex;align-items:center;justify-content:center;gap:6px;transition:.2s;
+}
+.gender-btn:hover{border-color:var(--green);background:#f0faf5;color:var(--green)}
+.gender-btn.sel-m{border-color:#3b82f6;background:rgba(59,130,246,.06);color:#1d4ed8}
+.gender-btn.sel-f{border-color:#a855f7;background:rgba(168,85,247,.06);color:#7c3aed}
+.gender-btn.sel-o{border-color:var(--saffron);background:rgba(217,113,31,.06);color:var(--saffron)}
+
+/* ── CHIPS ── */
+.chip-group{display:flex;flex-wrap:wrap;gap:7px;margin-top:4px}
+.chip{
+  padding:6px 13px;border:1.5px solid #e2e8f0;border-radius:20px;
+  background:#f8fafc;cursor:pointer;font-size:.76rem;font-weight:600;
+  color:var(--gray);transition:.2s;user-select:none;
+}
+.chip:hover{border-color:var(--green);color:var(--green);background:#f0faf5}
+.chip.sel{border-color:var(--green);background:rgba(21,95,53,.07);color:var(--green)}
+
+/* ── PASSWORD STRENGTH ── */
+.pass-bars{display:flex;gap:3px;margin-top:5px;align-items:center}
+.bar{height:3px;flex:1;border-radius:2px;background:#e2e8f0;transition:.3s}
+.bar.weak{background:#ef4444}
+.bar.fair{background:var(--saffron)}
+.bar.strong{background:var(--green)}
+.str-lbl{font-size:.67rem;font-weight:700;min-width:34px;text-align:right}
+
+/* ── NAV BUTTONS ── */
+.form-nav{display:flex;gap:9px;margin-top:16px}
+.btn-back{
+  flex:0 0 auto;padding:12px 18px;border:1.5px solid #e2e8f0;border-radius:13px;
+  background:#fff;font-family:'DM Sans',sans-serif;font-size:.88rem;
+  font-weight:600;color:var(--gray);cursor:pointer;transition:.2s;
+}
+.btn-back:hover{border-color:var(--green);color:var(--green)}
+.btn-next{
+  flex:1;padding:12px;border:none;border-radius:13px;
+  background:linear-gradient(135deg,var(--green),var(--green-light));
+  color:#fff;font-family:'DM Sans',sans-serif;font-size:.92rem;
+  font-weight:700;cursor:pointer;box-shadow:0 5px 16px rgba(21,95,53,.28);transition:.2s;
+}
+.btn-next:hover{transform:translateY(-1px);box-shadow:0 8px 22px rgba(21,95,53,.35)}
+
+/* ── SUBMIT BTN ── */
+.btn-submit{
+  width:100%;padding:13px;border:none;border-radius:13px;
+  background:linear-gradient(135deg,var(--green),var(--green-light));
+  color:#fff;font-family:'DM Sans',sans-serif;font-size:.95rem;font-weight:700;
+  cursor:pointer;box-shadow:0 5px 18px rgba(21,95,53,.3);transition:.2s;margin-top:4px;
+}
+.btn-submit:hover{transform:translateY(-2px);box-shadow:0 9px 26px rgba(21,95,53,.38)}
+
+/* ── FORGOT ── */
+.forgot-row{display:flex;justify-content:flex-end;margin:-4px 0 12px}
+.forgot-row a{font-size:.77rem;color:var(--saffron);text-decoration:none;font-weight:600}
+.forgot-row a:hover{text-decoration:underline}
+
+/* ── ERR HINT ── */
+.err-hint{font-size:.71rem;color:#ef4444;display:none;margin-top:2px}
+.err-hint.show{display:block}
+
+/* ── SECTION TAG ── */
+.sec-tag{
+  font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--saffron);margin-bottom:10px;display:block;
+}
+
+/* ── DIVIDER ── */
+.divider{display:flex;align-items:center;gap:10px;margin:14px 0;font-size:.73rem;color:#cbd5e1}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:#e2e8f0}
+
+/* ── TOAST ── */
+.toast{
+  position:fixed;top:22px;left:50%;transform:translateX(-50%) translateY(-90px);
+  background:#18181b;color:#fff;padding:12px 22px;border-radius:40px;
+  font-size:.86rem;font-weight:600;box-shadow:0 8px 28px rgba(0,0,0,.28);
+  z-index:999;transition:transform .4s cubic-bezier(.34,1.56,.64,1);
+  display:flex;align-items:center;gap:8px;white-space:nowrap;
+}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.toast.success::before{content:'✓';color:#4ade80}
+.toast.error::before{content:'✕';color:#f87171}
+.toast.info::before{content:'ℹ';color:#60a5fa}
+
+/* ── SUMMARY BOX ── */
+.summary{
+  background:#f0faf5;border:1px solid rgba(21,95,53,.12);
+  border-radius:14px;padding:16px;margin-bottom:14px;
+}
+.summary-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;
+  border-bottom:1px solid rgba(21,95,53,.07);font-size:.82rem}
+.summary-row:last-child{border-bottom:none}
+.summary-row span:first-child{color:var(--gray);font-weight:500}
+.summary-row span:last-child{color:var(--charcoal);font-weight:600}
+
+@media(max-width:900px){
+  .left-panel{display:none}
+  .right-panel{width:100%;padding:20px}
+  body{justify-content:center}
+}
+@media(max-width:480px){
+  .card{padding:24px 18px}
+  .row2,.row3{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- LEFT PANEL -->
+<div class="left-panel">
+  <div class="brand">
+    <div class="brand-logo">🌿</div>
+    <div class="brand-text">
+      <strong>Brindavan Bhawan Organization</strong>
+      <span>Health · Care · Impact</span>
+    </div>
+  </div>
+  <h1 class="left-headline">Your Health,<br/><em>Our Mission.</em></h1>
+  <p class="left-sub">Join BBO's care network — access expert nutrition plans, Down Syndrome therapy support, and elder care services. Register once, stay connected always.</p>
+  <div class="pillars">
+    <div class="pillar">
+      <div class="pillar-icon"></div>
+      <div class="pillar-text">
+        <strong>DhealthyDiet</strong>
+        <span>Disease-specific nutrition & lifestyle plans</span>
+      </div>
+    </div>
+    <div class="pillar">
+      <div class="pillar-icon"> </div>
+      <div class="pillar-text">
+        <strong>Down Syndrome Care</strong>
+        <span>Speech, OT & behavioral therapy</span>
+      </div>
+    </div>
+    <div class="pillar">
+      <div class="pillar-icon"> </div>
+      <div class="pillar-text">
+        <strong>Elder Care</strong>
+        <span>Assisted living with medical support</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- RIGHT PANEL -->
+<div class="right-panel">
+  <div class="card">
+
+    <!-- TABS -->
+    <div class="tabs">
+      <button class="tab active" id="tabLogin" onclick="switchTab('login')">Login</button>
+      <button class="tab" id="tabRegister" onclick="switchTab('register')">Register</button>
+    </div>
+
+    <!-- ══ LOGIN ══ -->
+    <div id="loginSection">
+      <div class="form-head">
+        <h2>Welcome back </h2>
+        <p>Login to access your BBO dashboard</p>
+      </div>
+      <div class="field">
+        <label>Email Address</label>
+        <input type="email" id="loginEmail" placeholder="you@email.com" oninput="clearErr(this)">
+        <span class="err-hint" id="loginEmailErr"></span>
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <input type="password" id="loginPassword" placeholder="Enter your password" oninput="clearErr(this)">
+        <span class="err-hint" id="loginPassErr"></span>
+      </div>
+      <div class="forgot-row">
+        <a href="#" onclick="forgotPassword(event)">Forgot Password?</a>
+      </div>
+      <button class="btn-submit" onclick="login()">Login to BBO →</button>
+      <div class="divider">or</div>
+      <p style="text-align:center;font-size:.81rem;color:var(--gray)">
+        New here? <a href="#" onclick="switchTab('register')" style="color:var(--green);font-weight:600">Create a free account</a>
+      </p>
+    </div>
+
+    <!-- ══ REGISTER ══ -->
+    <div id="registerSection" style="display:none">
+
+      <!-- STEP PROGRESS -->
+      <div class="steps" id="stepBar">
+        <div class="step active" id="s1"><div class="step-dot">1</div><span class="step-label">Personal</span><div class="step-line"></div></div>
+        <div class="step" id="s2"><div class="step-dot">2</div><span class="step-label">Health</span><div class="step-line"></div></div>
+        <div class="step" id="s3"><div class="step-dot">3</div><span class="step-label">Account</span><div class="step-line"></div></div>
+        <div class="step" id="s4"><div class="step-dot" style="border:none">✓</div><span class="step-label">Confirm</span></div>
+      </div>
+
+      <!-- ── STEP 1 : PERSONAL INFO ── -->
+      <div class="fpage active" id="fp1">
+        <div class="form-head">
+          <h2>Personal Details 🪪</h2>
+          <p>Tell us a bit about yourself</p>
+        </div>
+
+        <div class="row2">
+          <div class="field">
+            <label>Full Name *</label>
+            <input type="text" id="rName" placeholder="enter your name" oninput="clearErr(this)">
+            <span class="err-hint" id="rNameErr"></span>
+          </div>
+          <div class="field">
+            <label>Date of Birth *</label>
+            <input type="date" id="rDob" oninput="clearErr(this)" max="">
+            <span class="err-hint" id="rDobErr"></span>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Gender *</label>
+          <div class="gender-group">
+            <button type="button" class="gender-btn" id="gM" onclick="setGender('Male')">♂ Male</button>
+            <button type="button" class="gender-btn" id="gF" onclick="setGender('Female')">♀ Female</button>
+            <button type="button" class="gender-btn" id="gO" onclick="setGender('Other')">⚧ Other</button>
+          </div>
+          <span class="err-hint" id="rGenderErr"></span>
+        </div>
+
+        <div class="row2">
+          <div class="field">
+            <label>Phone Number *</label>
+            <input type="tel" id="rPhone" placeholder="91XXXXXXXX" maxlength="10"
+              oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,10);clearErr(this)">
+            <span class="err-hint" id="rPhoneErr"></span>
+          </div>
+          <div class="field">
+            <label>Alternate Phone</label>
+            <input type="tel" id="rAltPhone" placeholder="Optional" maxlength="10"
+              oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,10)">
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Address / City *</label>
+          <input type="text" id="rAddress" placeholder="e.g. Bhubaneswar, Odisha" oninput="clearErr(this)">
+          <span class="err-hint" id="rAddressErr"></span>
+        </div>
+
+        <div class="row2">
+          <div class="field">
+            <label>State</label>
+            <select class="sfield" id="rState">
+              <option value="">Select State</option>
+              <option>Odisha</option><option>West Bengal</option><option>Jharkhand</option>
+              <option>Chhattisgarh</option><option>Andhra Pradesh</option><option>Other</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>PIN Code</label>
+            <input type="text" id="rPin" placeholder="6-digit PIN" maxlength="6"
+              oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,6)">
+          </div>
+        </div>
+
+        <div class="form-nav">
+          <button class="btn-next" onclick="goStep(2)">Next: Health Info →</button>
+        </div>
+      </div>
+
+      <!-- ── STEP 2 : HEALTH INFO ── -->
+      <div class="fpage" id="fp2">
+        <div class="form-head">
+          <h2>Health Details 🩺</h2>
+          <p>Help us personalise your care</p>
+        </div>
+
+        <div class="row3">
+          <div class="field">
+            <label>Blood Group</label>
+            <select class="sfield" id="rBlood">
+              <option value="">Select</option>
+              <option>A+</option><option>A−</option>
+              <option>B+</option><option>B−</option>
+              <option>O+</option><option>O−</option>
+              <option>AB+</option><option>AB−</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Height (cm)</label>
+            <input type="number" id="rHeight" placeholder="e.g. 165" min="50" max="250">
+          </div>
+          <div class="field">
+            <label>Weight (kg)</label>
+            <input type="number" id="rWeight" placeholder="e.g. 65" min="10" max="300">
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Any Known Conditions / Allergies</label>
+          <textarea class="tfield" id="rConditions" placeholder="e.g. Diabetes, Hypertension, Lactose intolerance…"></textarea>
+        </div>
+
+        <div class="field">
+          <label>Service Interested In *</label>
+          <div class="chip-group" id="chipGroup">
+            <span class="chip" onclick="toggleChip(this)"> DhealthyDiet</span>
+            <span class="chip" onclick="toggleChip(this)"> Monthly Diet Plan</span>
+            <span class="chip" onclick="toggleChip(this)"> Down Syndrome Care</span>
+            <span class="chip" onclick="toggleChip(this)"> Elder Care</span>
+            <span class="chip" onclick="toggleChip(this)"> Corporate Wellness</span>
+          </div>
+          <span class="err-hint" id="rServiceErr"></span>
+        </div>
+
+        <div class="field">
+          <label>How did you hear about us?</label>
+          <select class="sfield" id="rSource">
+            <option value="">Select</option>
+            <option>Google Search</option>
+            <option>Instagram / Facebook</option>
+            <option>YouTube</option>
+            <option>Doctor Referral</option>
+            <option>Friend / Family</option>
+            <option>Health Camp</option>
+            <option>Other</option>
+          </select>
+        </div>
+
+        <div class="form-nav">
+          <button class="btn-back" onclick="goStep(1)">← Back</button>
+          <button class="btn-next" onclick="goStep(3)">Next: Account →</button>
+        </div>
+      </div>
+
+      <!-- ── STEP 3 : ACCOUNT ── -->
+      <div class="fpage" id="fp3">
+        <div class="form-head">
+          <h2>Create Account </h2>
+          <p>Set your login credentials</p>
+        </div>
+
+        <div class="field">
+          <label>Email Address *</label>
+          <input type="email" id="rEmail" placeholder="your@email.com" oninput="clearErr(this)">
+          <span class="err-hint" id="rEmailErr"></span>
+        </div>
+
+        <div class="field">
+          <label>Password *</label>
+          <input type="password" id="rPass" placeholder="Min 8 chars" oninput="checkStrength();clearErr(this)">
+          <div class="pass-bars">
+            <div class="bar" id="b1"></div>
+            <div class="bar" id="b2"></div>
+            <div class="bar" id="b3"></div>
+            <span class="str-lbl" id="strLbl" style="color:var(--gray)"></span>
+          </div>
+          <span class="err-hint" id="rPassErr"></span>
+        </div>
+
+        <div class="field">
+          <label>Confirm Password *</label>
+          <input type="password" id="rConfirm" placeholder="Repeat password" oninput="clearErr(this)">
+          <span class="err-hint" id="rConfirmErr"></span>
+        </div>
+
+        <div class="field" style="flex-direction:row;align-items:flex-start;gap:10px;margin-top:4px">
+          <input type="checkbox" id="rTerms" style="width:auto;margin-top:2px;accent-color:var(--green)">
+          <label for="rTerms" style="font-size:.78rem;color:var(--gray);cursor:pointer;line-height:1.55">
+            I agree to BBO's <a href="#" style="color:var(--green)">Terms & Conditions</a> and consent to receiving health-related communications.
+          </label>
+        </div>
+        <span class="err-hint" id="rTermsErr"></span>
+
+        <div class="form-nav">
+          <button class="btn-back" onclick="goStep(2)">← Back</button>
+          <button class="btn-next" onclick="goStep(4)">Review & Submit →</button>
+        </div>
+      </div>
+
+      <!-- ── STEP 4 : SUMMARY ── -->
+      <div class="fpage" id="fp4">
+        <div class="form-head">
+          <h2>Review & Confirm ✅</h2>
+          <p>Check your details before submitting</p>
+        </div>
+
+        <div class="summary" id="summaryBox"></div>
+
+        <div class="form-nav">
+          <button class="btn-back" onclick="goStep(3)">← Edit</button>
+          <button class="btn-next" onclick="submitRegister()">Create My Account 🌿</button>
+        </div>
+
+        <div class="divider">or</div>
+        <p style="text-align:center;font-size:.8rem;color:var(--gray)">
+          Already registered? <a href="#" onclick="switchTab('login')" style="color:var(--green);font-weight:600">Login here</a>
+        </p>
+      </div>
+
+    </div><!-- /registerSection -->
+
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ─── STATE ────────────────────────────────────────────────────
+let selectedGender = '';
+let currentStep = 1;
+
+// Set DOB max to today
+document.getElementById('rDob').max = new Date().toISOString().split('T')[0];
+
+// ─── TOAST ────────────────────────────────────────────────────
+function showToast(msg, type='info'){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'toast '+type;
+  void t.offsetWidth; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ─── TABS ─────────────────────────────────────────────────────
+function switchTab(tab){
+  const isLogin = tab==='login';
+  document.getElementById('loginSection').style.display = isLogin ? 'block' : 'none';
+  document.getElementById('registerSection').style.display = isLogin ? 'none' : 'block';
+  document.getElementById('tabLogin').classList.toggle('active', isLogin);
+  document.getElementById('tabRegister').classList.toggle('active', !isLogin);
+  if(!isLogin) goStep(1, false);
+}
+
+// ─── ERR HELPERS ──────────────────────────────────────────────
+function showErr(fid, eid, msg){
+  const f = document.getElementById(fid);
+  if(f) f.classList.add('err');
+  const e = document.getElementById(eid);
+  if(e){ e.textContent = msg; e.classList.add('show'); }
+}
+function clearErr(el){
+  el.classList.remove('err');
+  const n = el.nextElementSibling;
+  if(n && n.classList.contains('err-hint')) n.classList.remove('show');
+}
+function hideErr(eid){ const e=document.getElementById(eid); if(e) e.classList.remove('show'); }
+
+// ─── GENDER ──────────────────────────────────────────────────
+function setGender(g){
+  selectedGender = g;
+  ['gM','gF','gO'].forEach(id => document.getElementById(id).className = 'gender-btn');
+  if(g==='Male')   document.getElementById('gM').classList.add('sel-m');
+  if(g==='Female') document.getElementById('gF').classList.add('sel-f');
+  if(g==='Other')  document.getElementById('gO').classList.add('sel-o');
+  hideErr('rGenderErr');
+}
+
+// ─── SERVICE CHIPS ────────────────────────────────────────────
+function toggleChip(el){
+  el.classList.toggle('sel');
+  hideErr('rServiceErr');
+}
+function getChips(){
+  return [...document.querySelectorAll('#chipGroup .chip.sel')].map(c => c.textContent.trim());
+}
+
+// ─── PASSWORD STRENGTH ────────────────────────────────────────
+function checkStrength(){
+  const p = document.getElementById('rPass').value;
+  const b1=document.getElementById('b1'),b2=document.getElementById('b2'),b3=document.getElementById('b3');
+  const lbl=document.getElementById('strLbl');
+  [b1,b2,b3].forEach(b=>b.className='bar');
+  if(!p){ lbl.textContent=''; return; }
+  let score=0;
+  if(p.length>=8) score++;
+  if(/[A-Z]/.test(p)&&/[0-9]/.test(p)) score++;
+  if(p.length>=12&&/[^A-Za-z0-9]/.test(p)) score++;
+  if(score===1){ b1.classList.add('weak'); lbl.textContent='Weak'; lbl.style.color='#ef4444'; }
+  if(score===2){ b1.classList.add('fair');b2.classList.add('fair'); lbl.textContent='Fair'; lbl.style.color=getComputedStyle(document.documentElement).getPropertyValue('--saffron'); }
+  if(score===3){ b1.classList.add('strong');b2.classList.add('strong');b3.classList.add('strong'); lbl.textContent='Strong'; lbl.style.color='#155f35'; }
+}
+
+// ─── STEP NAVIGATION ─────────────────────────────────────────
+function updateStepBar(step){
+  for(let i=1;i<=4;i++){
+    const el = document.getElementById('s'+i);
+    el.classList.remove('active','done');
+    if(i < step) el.classList.add('done');
+    if(i === step) el.classList.add('active');
+  }
+}
+
+function goStep(n, validate=true){
+  if(validate && n > currentStep){
+    if(!validateStep(currentStep)) return;
+  }
+  // hide all pages
+  document.querySelectorAll('.fpage').forEach(p=>p.classList.remove('active'));
+  document.getElementById('fp'+n).classList.add('active');
+  currentStep = n;
+  updateStepBar(n);
+  if(n===4) buildSummary();
+  // scroll card to top
+  document.querySelector('.card').scrollTop = 0;
+}
+
+// ─── VALIDATION PER STEP ─────────────────────────────────────
+function validateStep(step){
+  let ok = true;
+
+  if(step===1){
+    const name    = document.getElementById('rName').value.trim();
+    const dob     = document.getElementById('rDob').value;
+    const phone   = document.getElementById('rPhone').value.trim();
+    const address = document.getElementById('rAddress').value.trim();
+
+    if(!name)   { showErr('rName','rNameErr','Enter your full name'); ok=false; }
+    if(!dob)    { showErr('rDob','rDobErr','Select your date of birth'); ok=false; }
+    else {
+      const age = Math.floor((new Date()-new Date(dob))/(365.25*24*3600*1000));
+      if(age<1||age>120){ showErr('rDob','rDobErr','Enter a valid date of birth'); ok=false; }
+    }
+    if(!selectedGender){ document.getElementById('rGenderErr').textContent='Select your gender'; document.getElementById('rGenderErr').classList.add('show'); ok=false; }
+    if(!/^[0-9]{10}$/.test(phone)){ showErr('rPhone','rPhoneErr','Enter a valid 10-digit number'); ok=false; }
+    if(!address){ showErr('rAddress','rAddressErr','Enter your city or address'); ok=false; }
+  }
+
+  if(step===2){
+    if(!getChips().length){ document.getElementById('rServiceErr').textContent='Select at least one service'; document.getElementById('rServiceErr').classList.add('show'); ok=false; }
+  }
+
+  if(step===3){
+    const email   = document.getElementById('rEmail').value.trim();
+    const pass    = document.getElementById('rPass').value;
+    const confirm = document.getElementById('rConfirm').value;
+    const terms   = document.getElementById('rTerms').checked;
+
+    const emailPat = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+    if(!emailPat.test(email)){ showErr('rEmail','rEmailErr','Enter a valid email address'); ok=false; }
+    else {
+      const users = JSON.parse(localStorage.getItem('bboUsers')||'[]');
+      if(users.find(u=>u.email===email)){ showErr('rEmail','rEmailErr','This email is already registered'); ok=false; }
+    }
+    const passPat = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
+    if(!passPat.test(pass)){ showErr('rPass','rPassErr','8+ chars, 1 uppercase & 1 number required'); ok=false; }
+    if(pass !== confirm){ showErr('rConfirm','rConfirmErr','Passwords do not match'); ok=false; }
+    if(!terms){ document.getElementById('rTermsErr').textContent='Please accept the terms to continue'; document.getElementById('rTermsErr').classList.add('show'); ok=false; }
+  }
+
+  return ok;
+}
+
+// ─── SUMMARY ─────────────────────────────────────────────────
+function calcAge(dob){
+  return Math.floor((new Date()-new Date(dob))/(365.25*24*3600*1000));
+}
+function buildSummary(){
+  const rows = [
+    ['Name',    document.getElementById('rName').value],
+    ['DOB',     document.getElementById('rDob').value + ' (Age ' + calcAge(document.getElementById('rDob').value) + ')'],
+    ['Gender',  selectedGender],
+    ['Phone',   document.getElementById('rPhone').value],
+    ['Address', document.getElementById('rAddress').value],
+    ['Blood',   document.getElementById('rBlood').value || '—'],
+    ['Height',  document.getElementById('rHeight').value ? document.getElementById('rHeight').value+' cm' : '—'],
+    ['Weight',  document.getElementById('rWeight').value ? document.getElementById('rWeight').value+' kg' : '—'],
+    ['Services',getChips().join(', ') || '—'],
+    ['Email',   document.getElementById('rEmail').value],
+  ];
+  document.getElementById('summaryBox').innerHTML = rows.map(([k,v])=>
+    `<div class="summary-row"><span>${k}</span><span>${v}</span></div>`
+  ).join('');
+}
+
+// ─── SUBMIT ──────────────────────────────────────────────────
+function submitRegister(){
+  const users = JSON.parse(localStorage.getItem('bboUsers')||'[]');
+  const email = document.getElementById('rEmail').value.trim();
+  if(users.find(u=>u.email===email)){
+    goStep(3,false);
+    showErr('rEmail','rEmailErr','This email is already registered'); return;
+  }
+
+  const dob = document.getElementById('rDob').value;
+  users.push({
+    name:       document.getElementById('rName').value.trim(),
+    dob,
+    age:        calcAge(dob),
+    gender:     selectedGender,
+    phone:      document.getElementById('rPhone').value,
+    altPhone:   document.getElementById('rAltPhone').value,
+    address:    document.getElementById('rAddress').value.trim(),
+    state:      document.getElementById('rState').value,
+    pin:        document.getElementById('rPin').value,
+    blood:      document.getElementById('rBlood').value,
+    height:     document.getElementById('rHeight').value,
+    weight:     document.getElementById('rWeight').value,
+    conditions: document.getElementById('rConditions').value.trim(),
+    services:   getChips(),
+    source:     document.getElementById('rSource').value,
+    email,
+    password:   document.getElementById('rPass').value,
+    registeredAt: new Date().toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})
+  });
+  localStorage.setItem('bboUsers', JSON.stringify(users));
+  showToast('Account created! Please login 🎉', 'success');
+  setTimeout(() => switchTab('login'), 1300);
+}
+
+// ─── LOGIN ────────────────────────────────────────────────────
+function login(){
+  const email = document.getElementById('loginEmail').value.trim();
+  const pass  = document.getElementById('loginPassword').value;
+  if(!email){ showErr('loginEmail','loginEmailErr','Enter your email'); return; }
+  if(!pass) { showErr('loginPassword','loginPassErr','Enter your password'); return; }
+
+  if(email==='admin@bbo.com' && pass==='Admin@123'){
+    localStorage.setItem('adminLogin','true');
+    localStorage.removeItem('loggedIn');
+    showToast('Admin login successful!','success');
+    setTimeout(()=>window.location.href='admin.html',800); return;
+  }
+
+  const users = JSON.parse(localStorage.getItem('bboUsers')||'[]');
+  const user  = users.find(u=>u.email===email && u.password===pass);
+  if(user){
+    localStorage.setItem('loggedIn','true');
+    localStorage.setItem('loggedInEmail', email);
+    localStorage.removeItem('adminLogin');
+    showToast('Welcome back, '+user.name.split(' ')[0]+'! 👋','success');
+    setTimeout(()=>window.location.href='dashboard.html',800);
+  } else {
+    const exists = users.find(u=>u.email===email);
+    if(!exists) showErr('loginEmail','loginEmailErr','No account found — please register first');
+    else showErr('loginPassword','loginPassErr','Incorrect password');
+  }
+}
+
+// ─── FORGOT PASSWORD ─────────────────────────────────────────
+function forgotPassword(e){
+  e.preventDefault();
+  const email = document.getElementById('loginEmail').value.trim();
+  if(!email){ showErr('loginEmail','loginEmailErr','Enter your email first'); return; }
+  const users = JSON.parse(localStorage.getItem('bboUsers')||'[]');
+  const user = users.find(u=>u.email===email);
+  if(user) showToast('Your password: '+user.password,'info');
+  else showErr('loginEmail','loginEmailErr','No account found with this email');
+}
+
+// ─── AUTO-REDIRECT ────────────────────────────────────────────
+if(localStorage.getItem('adminLogin')==='true') window.location.href='admin.html';
+if(localStorage.getItem('loggedIn')==='true') window.location.href='dashboard.html';
+
+// ─── ENTER KEY ────────────────────────────────────────────────
+document.addEventListener('keydown', e=>{
+  if(e.key!=='Enter') return;
+  if(document.getElementById('loginSection').style.display!=='none') login();
+});
+</script>
+</body>
+</html>

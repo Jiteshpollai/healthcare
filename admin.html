@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard — BBO</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --green:#155f35;--green-mid:#1e7d48;--green-light:#27a05c;
+  --saffron:#d9711f;--saffron-lt:#f0963e;
+  --cream:#fdf8f2;--charcoal:#18181b;--gray:#5c6470;
+  --sidebar:230px;
+  --sh:0 4px 24px rgba(21,95,53,.1);
+}
+body{font-family:'DM Sans',sans-serif;background:#f0f4f1;display:flex;min-height:100vh;color:var(--charcoal)}
+
+/* ── SIDEBAR ── */
+.sidebar{
+  width:var(--sidebar);flex-shrink:0;
+  background:linear-gradient(165deg,#0c2410 0%,#0f3620 100%);
+  min-height:100vh;position:fixed;top:0;left:0;
+  display:flex;flex-direction:column;
+  box-shadow:4px 0 24px rgba(0,0,0,.2);z-index:100;
+}
+.sb-brand{
+  padding:28px 20px 20px;
+  border-bottom:1px solid rgba(255,255,255,.08);
+  display:flex;align-items:center;gap:12px;
+}
+.sb-logo{
+  width:44px;height:44px;border-radius:50%;
+  background:linear-gradient(135deg,var(--saffron),var(--saffron-lt));
+  display:grid;place-items:center;font-size:20px;flex-shrink:0;
+  box-shadow:0 4px 14px rgba(217,113,31,.4);
+}
+.sb-brand-text strong{display:block;font-family:'Playfair Display',serif;font-size:.88rem;color:#fff}
+.sb-brand-text span{font-size:.65rem;color:rgba(255,255,255,.4)}
+
+.sb-admin-badge{
+  margin:16px 16px 4px;
+  background:rgba(217,113,31,.15);border:1px solid rgba(217,113,31,.3);
+  border-radius:10px;padding:10px 14px;text-align:center;
+}
+.sb-admin-badge .ico{font-size:1.5rem;display:block;margin-bottom:4px}
+.sb-admin-badge strong{display:block;font-size:.88rem;color:#fcd272}
+.sb-admin-badge span{font-size:.7rem;color:rgba(255,255,255,.4)}
+
+.sb-nav{flex:1;padding:16px 12px;display:flex;flex-direction:column;gap:4px}
+.sb-link{
+  display:flex;align-items:center;gap:10px;
+  padding:11px 14px;border-radius:12px;
+  color:rgba(255,255,255,.6);font-size:.87rem;font-weight:500;
+  cursor:pointer;border:none;background:none;
+  width:100%;text-align:left;transition:.2s;
+}
+.sb-link .ico{font-size:1.1rem;width:22px;text-align:center;flex-shrink:0}
+.sb-link:hover{background:rgba(255,255,255,.08);color:#fff}
+.sb-link.active{background:rgba(217,113,31,.2);color:#fcd272;font-weight:600}
+.sb-bottom{padding:16px 12px;border-top:1px solid rgba(255,255,255,.07)}
+.btn-logout{
+  display:flex;align-items:center;gap:10px;width:100%;
+  padding:11px 14px;border:1px solid rgba(255,80,80,.22);
+  border-radius:12px;background:rgba(255,80,80,.07);
+  color:#ff9090;font-size:.87rem;font-weight:600;cursor:pointer;transition:.2s;
+}
+.btn-logout:hover{background:rgba(255,80,80,.16);color:#ffb3b3}
+
+/* ── MAIN ── */
+.main{margin-left:var(--sidebar);flex:1;padding:32px;min-height:100vh}
+.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px}
+.page-title{font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:900}
+.page-title span{color:var(--saffron)}
+.topbar-right{display:flex;align-items:center;gap:12px}
+.topbar-date{font-size:.8rem;color:var(--gray);background:#fff;padding:8px 14px;border-radius:10px;box-shadow:var(--sh)}
+.admin-tag{
+  background:linear-gradient(135deg,var(--saffron),var(--saffron-lt));
+  color:#fff;font-size:.75rem;font-weight:700;padding:7px 14px;
+  border-radius:10px;box-shadow:0 3px 12px rgba(217,113,31,.3);
+}
+
+/* PAGES */
+.page{display:none}
+.page.active{display:block}
+
+/* ── KPI ── */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px}
+.kpi{
+  background:#fff;border-radius:18px;padding:22px;box-shadow:var(--sh);
+  border-top:3px solid transparent;transition:transform .2s,box-shadow .2s;
+}
+.kpi:hover{transform:translateY(-3px);box-shadow:0 8px 28px rgba(21,95,53,.12)}
+.kpi.k1{border-top-color:#4ade80}
+.kpi.k2{border-top-color:var(--saffron)}
+.kpi.k3{border-top-color:#818cf8}
+.kpi.k4{border-top-color:#f87171}
+.kpi-icon{font-size:1.7rem;margin-bottom:8px}
+.kpi-val{font-family:'Playfair Display',serif;font-size:2rem;font-weight:900;color:var(--charcoal)}
+.kpi-label{font-size:.75rem;color:var(--gray);margin-top:2px}
+.kpi-trend{font-size:.72rem;color:#4ade80;font-weight:600;margin-top:4px}
+
+/* ── TABLES ── */
+.table-box{
+  background:#fff;border-radius:20px;padding:24px;box-shadow:var(--sh);margin-bottom:24px;
+}
+.table-head{
+  display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;
+}
+.table-title{font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:700}
+.table-search{
+  padding:9px 14px;border:1.5px solid #e2e8f0;border-radius:10px;
+  font-family:'DM Sans',sans-serif;font-size:.84rem;
+  outline:none;transition:.2s;background:#f8fafc;width:220px;
+}
+.table-search:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(21,95,53,.08)}
+
+table{width:100%;border-collapse:collapse}
+th{
+  padding:11px 14px;text-align:left;
+  font-size:.73rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
+  color:var(--gray);background:#f8fafc;border-bottom:2px solid #f1f5f1;
+}
+td{
+  padding:13px 14px;font-size:.87rem;
+  border-bottom:1px solid #f1f5f1;color:var(--charcoal);
+}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#fafcfa}
+.badge{
+  display:inline-block;padding:3px 10px;border-radius:20px;
+  font-size:.72rem;font-weight:700;
+}
+.badge.active{background:#e4f5ec;color:var(--green)}
+.badge.admin{background:rgba(217,113,31,.12);color:var(--saffron)}
+
+.empty-row{text-align:center;padding:32px!important;color:var(--gray);font-size:.9rem}
+
+/* ── OVERVIEW ── */
+.welcome-banner{
+  background:linear-gradient(135deg,#0c2410,#0f3620,#5c2000);
+  border-radius:22px;padding:26px 32px;
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:24px;position:relative;overflow:hidden;
+}
+.welcome-banner::before{content:'⚙️';position:absolute;right:36px;top:50%;transform:translateY(-50%);font-size:5rem;opacity:.1;}
+.wb-text h2{font-family:'Playfair Display',serif;font-size:1.35rem;color:#fff;margin-bottom:.3rem}
+.wb-text p{font-size:.85rem;color:rgba(255,255,255,.55)}
+.wb-badge{background:rgba(252,210,114,.15);border:1px solid rgba(252,210,114,.3);border-radius:30px;padding:9px 18px;font-size:.78rem;font-weight:600;color:#fcd272}
+
+/* TOAST */
+.toast{
+  position:fixed;top:24px;left:50%;transform:translateX(-50%) translateY(-80px);
+  background:#18181b;color:#fff;padding:13px 24px;border-radius:40px;
+  font-size:.88rem;font-weight:600;box-shadow:0 8px 30px rgba(0,0,0,.3);
+  z-index:999;transition:transform .4s cubic-bezier(.34,1.56,.64,1);
+  display:flex;align-items:center;gap:8px;
+}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.toast.success::before{content:'✓';color:#4ade80}
+.toast.error::before{content:'✕';color:#f87171}
+.toast.info::before{content:'ℹ';color:#60a5fa}
+
+@media(max-width:900px){
+  .kpi-grid{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:640px){
+  .sidebar{display:none}
+  .main{margin-left:0;padding:16px}
+  .kpi-grid{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="sb-brand">
+    <div class="sb-logo">🌿</div>
+    <div class="sb-brand-text">
+      <strong>BBO Admin Panel</strong>
+      <span>Control Center</span>
+    </div>
+  </div>
+
+  <div class="sb-admin-badge">
+    <span class="ico">🔑</span>
+    <strong>Super Admin</strong>
+    <span>admin@bbo.com</span>
+  </div>
+
+  <div class="sb-nav">
+    <button class="sb-link active" onclick="showPage('overview',this)">
+      <span class="ico">📊</span> Overview
+    </button>
+    <button class="sb-link" onclick="showPage('users',this)">
+      <span class="ico">👥</span> Registered Users
+    </button>
+    <button class="sb-link" onclick="showPage('services',this)">
+      <span class="ico">🩺</span> Services
+    </button>
+  </div>
+
+  <div class="sb-bottom">
+    <button class="btn-logout" onclick="logout()">
+      <span class="ico">🚪</span> Logout
+    </button>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <div class="page-title" id="pageTitle">Admin <span>Overview</span></div>
+    <div class="topbar-right">
+      <div class="topbar-date" id="todayDate"></div>
+      <div class="admin-tag">🔑 Admin</div>
+    </div>
+  </div>
+
+  <!-- ── OVERVIEW PAGE ── -->
+  <div class="page active" id="page-overview">
+    <div class="welcome-banner">
+      <div class="wb-text">
+        <h2>Welcome, Admin 👑</h2>
+        <p>Manage BBO's registered users and service data from here.</p>
+      </div>
+      <div class="wb-badge">⚙️ Admin Access</div>
+    </div>
+
+    <div class="kpi-grid">
+      <div class="kpi k1">
+        <div class="kpi-icon">👥</div>
+        <div class="kpi-val" id="kpiUsers">0</div>
+        <div class="kpi-label">Total Users</div>
+        <div class="kpi-trend">↑ Registered</div>
+      </div>
+      <div class="kpi k2">
+        <div class="kpi-icon">🩺</div>
+        <div class="kpi-val">3</div>
+        <div class="kpi-label">Active Services</div>
+        <div class="kpi-trend">↑ All Live</div>
+      </div>
+      <div class="kpi k3">
+        <div class="kpi-icon">📍</div>
+        <div class="kpi-val">1</div>
+        <div class="kpi-label">Locations</div>
+        <div class="kpi-trend">Bhubaneswar</div>
+      </div>
+      <div class="kpi k4">
+        <div class="kpi-icon">🚀</div>
+        <div class="kpi-val">4</div>
+        <div class="kpi-label">Growth Phases</div>
+        <div class="kpi-trend">Phase 1 Active</div>
+      </div>
+    </div>
+
+    <div class="table-box">
+      <div class="table-head">
+        <div class="table-title">Recent Registrations</div>
+      </div>
+      <table>
+        <thead>
+          <tr><th>Name</th><th>Email</th><th>Phone</th><th>Registered</th><th>Status</th></tr>
+        </thead>
+        <tbody id="recentTable"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ── USERS PAGE ── -->
+  <div class="page" id="page-users">
+    <div class="table-box">
+      <div class="table-head">
+        <div class="table-title">All Registered Users</div>
+        <input type="text" class="table-search" id="userSearch" placeholder="🔍 Search name or email…" oninput="filterUsers()">
+      </div>
+      <table>
+        <thead>
+          <tr><th>#</th><th>Name</th><th>Phone</th><th>Age</th><th>City</th><th>Email</th><th>Registered</th><th>Status</th></tr>
+        </thead>
+        <tbody id="usersTable"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ── SERVICES PAGE ── -->
+  <div class="page" id="page-services">
+    <div class="table-box">
+      <div class="table-head">
+        <div class="table-title">BBO Service Directory</div>
+      </div>
+      <table>
+        <thead>
+          <tr><th>Service</th><th>Vertical</th><th>Pricing</th><th>Phase</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Single Consultation</td><td>🥗 DhealthyDiet</td><td>₹500–₹2,000</td><td>Phase 1</td><td><span class="badge active">Live</span></td></tr>
+          <tr><td>Monthly Diet Plan</td><td>🥗 DhealthyDiet</td><td>₹2,000–₹8,000</td><td>Phase 1</td><td><span class="badge active">Live</span></td></tr>
+          <tr><td>Corporate Wellness</td><td>🥗 DhealthyDiet</td><td>Custom</td><td>Phase 2</td><td><span class="badge active">Live</span></td></tr>
+          <tr><td>Speech Therapy</td><td>🧡 Down Syndrome</td><td>Monthly</td><td>Phase 3</td><td><span class="badge" style="background:#fffbeb;color:#b45309">Upcoming</span></td></tr>
+          <tr><td>Occupational Therapy</td><td>🧡 Down Syndrome</td><td>Monthly</td><td>Phase 3</td><td><span class="badge" style="background:#fffbeb;color:#b45309">Upcoming</span></td></tr>
+          <tr><td>Standard Room</td><td>👴 Elder Care</td><td>₹10k–₹25k/mo</td><td>Phase 4</td><td><span class="badge" style="background:#fef2f2;color:#dc2626">Planned</span></td></tr>
+          <tr><td>Premium Room</td><td>👴 Elder Care</td><td>₹25k–₹50k/mo</td><td>Phase 4</td><td><span class="badge" style="background:#fef2f2;color:#dc2626">Planned</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ─── AUTH GUARD ───────────────────────────────────────────────
+if(localStorage.getItem('adminLogin') !== 'true'){
+  window.location.href = 'login.html';
+}
+
+// ─── LOAD DATA ────────────────────────────────────────────────
+let allUsers = JSON.parse(localStorage.getItem('bboUsers') || '[]');
+
+document.getElementById('kpiUsers').textContent = allUsers.length;
+document.getElementById('todayDate').textContent =
+  new Date().toLocaleDateString('en-IN',{weekday:'short',day:'2-digit',month:'short',year:'numeric'});
+
+function renderRecentTable(){
+  const tbody = document.getElementById('recentTable');
+  if(!allUsers.length){
+    tbody.innerHTML = '<tr><td colspan="5" class="empty-row">No users registered yet.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = allUsers.slice(-5).reverse().map(u => `
+    <tr>
+      <td><strong>${esc(u.name)}</strong></td>
+      <td>${esc(u.email)}</td>
+      <td>${esc(u.phone)}</td>
+      <td>${esc(u.registeredAt||'—')}</td>
+      <td><span class="badge active">Active</span></td>
+    </tr>
+  `).join('');
+}
+
+function renderUsersTable(list){
+  const tbody = document.getElementById('usersTable');
+  if(!list.length){
+    tbody.innerHTML = '<tr><td colspan="8" class="empty-row">No users found.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = list.map((u,i) => `
+    <tr>
+      <td style="color:var(--gray);font-size:.8rem">${i+1}</td>
+      <td><strong>${esc(u.name)}</strong></td>
+      <td>${esc(u.phone)}</td>
+      <td>${esc(u.age)}</td>
+      <td>${esc(u.address)}</td>
+      <td>${esc(u.email)}</td>
+      <td>${esc(u.registeredAt||'—')}</td>
+      <td><span class="badge active">Active</span></td>
+    </tr>
+  `).join('');
+}
+
+function filterUsers(){
+  const q = document.getElementById('userSearch').value.toLowerCase();
+  renderUsersTable(allUsers.filter(u =>
+    u.name.toLowerCase().includes(q) || u.email.toLowerCase().includes(q)
+  ));
+}
+
+function esc(s){ return String(s||'').replace(/</g,'&lt;').replace(/>/g,'&gt;') }
+
+renderRecentTable();
+renderUsersTable(allUsers);
+
+// ─── PAGE NAVIGATION ──────────────────────────────────────────
+const pageTitles = {
+  overview:'Admin <span>Overview</span>',
+  users:'Registered <span>Users</span>',
+  services:'BBO <span>Services</span>',
+};
+function showPage(id,btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  document.querySelectorAll('.sb-link').forEach(l=>l.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  document.getElementById('pageTitle').innerHTML = pageTitles[id]||id;
+}
+
+// ─── LOGOUT ──────────────────────────────────────────────────
+function logout(){
+  localStorage.removeItem('adminLogin');
+  showToast('Admin logged out.','info');
+  setTimeout(()=> window.location.href='login.html', 900);
+}
+
+// ─── TOAST ───────────────────────────────────────────────────
+function showToast(msg,type='info'){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className='toast '+type;
+  void t.offsetWidth; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+</script>
+</body>
+</html>
